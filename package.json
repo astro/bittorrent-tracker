@@ -1,0 +1,46 @@
+{
+  "name": "bittorrent-tracker",
+  "description": "Talk to your BitTorrent tracker",
+  "version": "0.0.1",
+  "author": {
+    "name": "Astro",
+    "email": "astro@spaceboyz.net",
+    "url": "http://spaceboyz.net/~astro/"
+  },
+  "bugs": {
+    "url": "https://github.com/astro/bittorrent-tracker/issues"
+  },
+  "dependencies": {
+    "bncode": "~0.5.0",
+    "inherits": "~2.0.1"
+  },
+  "devDependencies": {
+    "tape": "2.x"
+  },
+  "keywords": [
+    "torrent",
+    "bittorrent",
+    "tracker",
+    "udp",
+    "http"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/astro/bittorrent-tracker.git"
+  },
+  "scripts": {
+    "test": "tape test/*.js"
+  },
+  "testling": {
+    "files": "test/*.js",
+    "browsers": [
+      "ie/9..latest",
+      "chrome/25..latest",
+      "firefox/20..latest",
+      "safari/6..latest",
+      "opera/15.0..latest"
+    ]
+  }
+}
