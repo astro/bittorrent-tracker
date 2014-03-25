@@ -81,7 +81,7 @@ Tracker.prototype = {
         var m;
 
         if ((/^https?:\/\//.test(this.url)))
-            return requestHTTP(url, info, cb);
+            return requestHTTP(this.url, info, cb);
         else if ((m = this.url.match(/^udp:\/\/([^:]+):(\d+)/)))
             return requestUDP(m[1], parseInt(m[2]), info, cb);
     },

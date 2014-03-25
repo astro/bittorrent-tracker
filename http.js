@@ -6,17 +6,26 @@ function defaultInterval() {
 }
 
 module.exports = function(url, info, cb) {
-    var url = url + "?" + infoToQueryParam(info);
-    console.log("url", url);
-    request(url, function(err, data) {
-        console.log('request', url, arguments);
+    url = url + "?" + infoToQueryParam(info);
+    request({
+        url: url,
+        encoding: null
+    }, function(err, data) {
+        console.log("tracker", url, arguments);
+        var ip, port;
 
         if (err) {
             return cb(err);
         }
 
         var result = [];
-        var response = bncode.decode(data.body);
+        var response;
+        try {
+            response = bncode.decode(data.body);
+        } catch (e) {
+            console.log(url, "error parsing", data.body);
+            return cb(e);
+        }
         var peers = response && response.peers;
         if (peers && peers.__proto__ && peers.__proto__.constructor === Array) {
             /* Non-compact IPv4 */
@@ -25,8 +34,8 @@ module.exports = function(url, info, cb) {
         if (Buffer.isBuffer(response.peers)) {
             /* Compact IPv4 */
             for(var i = 0; i < peers.length - 5; i += 6) {
-                var ip = [0, 1, 2, 3].map(function(j) { return peers[i + j]; }).join(".");
-                var port = (peers[i + 4] << 8) | peers[i + 5];
+                ip = [0, 1, 2, 3].map(function(j) { return peers[i + j]; }).join(".");
+                port = (peers[i + 4] << 8) | peers[i + 5];
                 result.push({ ip: ip, port: port });
             }
         }
@@ -39,16 +48,16 @@ module.exports = function(url, info, cb) {
         if (Buffer.isBuffer(peers6)) {
             /* Compact IPv6 */
             for(var i = 0; i < peers6.length - 17; i += 18) {
-                var ip = [0, 1, 2, 3, 4, 5, 6, 7].map(function(j) {
+                ip = [0, 1, 2, 3, 4, 5, 6, 7].map(function(j) {
                  return peers6.readUInt16BE(i + j * 2).toString(16);
                 }).join(":");
-                var port = peers6.readUInt16BE(i + 16);
+                port = peers6.readUInt16BE(i + 16);
                 result.push({ ip: ip, port: port });
             }
         }
 
-        var message = response.interval || response['min interval'] || defaultInterval();
-        var error;
+        var interval  = response.interval || response['min interval'] || defaultInterval();
+        var message;
         if (result.length < 1 &&
             (message = (result['failure reason'] || result['warning message']))) {
             cb(new Error(message));
@@ -80,7 +89,11 @@ function infoToQueryParam(info) {
 
     var queryStrs = [];
     for(var k in query) {
-        queryStrs.push(k + "=" + encodeQuery(query[k]));
+        var v = query[k];
+        var e = (k === 'info_hash' || k === 'peer_id') ?
+            urlencodeBuffer(v) :
+            encodeQuery(v);
+        queryStrs.push(k + "=" + e);
     }
     return queryStrs.join("&");
 }
@@ -98,4 +111,27 @@ function encodeQuery(v) {
     } else {
         return encodeURIComponent("" + v);
     }
+}
+
+function urlencodeBuffer(b) {
+    console.log("urlencodeBuffer", b);
+    if (!Buffer.isBuffer(b)) {
+        b = new Buffer(b, 'hex');
+    }
+
+    var r = "";
+    for(var i = 0; i < b.length; i++) {
+        r += "%" + lpad(b[i].toString(16), 2, "0");
+    }
+    return r;
+}
+
+function lpad(s, len, pad) {
+    if (typeof s !== 'string') {
+        s = "" + s;
+    }
+    while(s.length < len) {
+        s = pad + s;
+    }
+    return s;
 }
