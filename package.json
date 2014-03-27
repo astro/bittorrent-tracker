@@ -1,5 +1,5 @@
 {
-  "name": "bittorrent-tracker",
+  "name": "bittorrent-tracker-client",
   "description": "Talk to your BitTorrent tracker",
   "version": "0.0.1",
   "author": {
