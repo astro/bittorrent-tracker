@@ -61,7 +61,7 @@ module.exports = function(address, port, info, cb) {
             0, 0, 0, 0, 0, 0, 0, 0,  /* connection_id */
             0, 0, 0, 1,  /* action: announce */
             0, 0, 0, 0,  /* transaction_id, see below */
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  /* info_hash */
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  /* infoHash */
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  /* peer_id */
             0, 0, 0, 0, 0, 0, 0, 0,  /* downloaded */
             0, 0, 0, 0, 0, 0, 0, 0,  /* left */
@@ -77,14 +77,14 @@ module.exports = function(address, port, info, cb) {
         announceReq.writeUInt32BE(connectionId[1], 4);
         announceReq.writeUInt32BE(transactionId, 12);
         var i;
-        var info_hash = Buffer.isBuffer(info.info_hash) ?
-                info.info_hash :
-                new Buffer(info.info_hash, 'hex');
+        var infoHash = Buffer.isBuffer(info.infoHash) ?
+                info.infoHash :
+                new Buffer(info.infoHash, 'hex');
         for(i = 0; i < 20; i++) {
-            announceReq[16 + i] = info_hash[i];
+            announceReq[16 + i] = infoHash[i];
         }
         for(i = 0; i < 20; i++) {
-            announceReq[36 + i] = info.peer_id[i];
+            announceReq[36 + i] = info.peerId[i];
         }
         announceReq.writeUInt32BE(info.downloaded >> 32, 56);
         announceReq.writeUInt32BE(info.downloaded & 0xffffffff, 60);
