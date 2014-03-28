@@ -1,7 +1,7 @@
 {
   "name": "bittorrent-tracker-client",
   "description": "Talk to your BitTorrent tracker",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": {
     "name": "Astro",
     "email": "astro@spaceboyz.net",
